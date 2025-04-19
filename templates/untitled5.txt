@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verification Result</title>
+</head>
+<body>
+    <h2>Verification Status: {{ status }}</h2>
+
+    <h3>Extracted Text</h3>
+    <pre>{{ text }}</pre>
+
+    <h3>Processed Image</h3>
+    <img src="{{ image_path }}" width="500">
+
+    <br><br>
+    {% if "Verified" in status %}
+    <a href="/download">Download Certified Image</a><br>
+    {% endif %}
+    <a href="/">Upload Another File</a>
+</body>
+</html>

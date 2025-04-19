@@ -1,0 +1,108 @@
+import os
+from flask import Flask, request, render_template, send_from_directory
+from werkzeug.utils import secure_filename
+from pdf2image import convert_from_path
+from PIL import Image, ImageDraw, ImageFont
+import pytesseract
+import re
+from shutil import copyfile
+
+# Configuration
+UPLOAD_FOLDER = 'uploads'
+OUTPUT_FOLDER = 'static'
+POPPLER_PATH = r'C:\path\to\poppler\bin' # Set this to your poppler path
+TESSERACT_CMD = r'C:\Program Files\Tesseract-OCR\tesseract.exe' # Update if needed
+pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
+
+# Dummy database for ID verification
+verified_ids = {
+    "022155519087": "Siyabonga Hlayisani Shipalana",
+}
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Ensure folders exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+
+def find_sa_id(text):
+    match = re.search(r'\b\d{13}\b', text)
+    return match.group() if match else None
+
+def add_certification_stamp(image_path):
+    img = Image.open(image_path).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    font_path = r"C:\Windows\Fonts\arialbd.ttf" # Use a bold font
+    font = ImageFont.truetype(font_path, 36)
+
+    text = "CERTIFIED BY EAZY CERT"
+    text_width, text_height = draw.textsize(text, font=font)
+    margin = 20
+    position = (img.width - text_width - margin, img.height - text_height - margin)
+
+    draw.rectangle([position, (position[0] + text_width + 10, position[1] + text_height + 10)], fill="yellow")
+    draw.text((position[0] + 5, position[1] + 5), text, font=font, fill="black")
+
+    certified_path = os.path.join(OUTPUT_FOLDER, 'certified_image.jpg')
+    img.save(certified_path)
+    return certified_path
+
+def convert_image_to_pdf(image_path):
+    img = Image.open(image_path).convert("RGB")
+    pdf_path = os.path.join(OUTPUT_FOLDER, 'certified_output.pdf')
+    img.save(pdf_path, "PDF", resolution=100.0)
+    return pdf_path
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/upload', methods=['POST'])
+def upload_pdf():
+    if 'pdf' not in request.files:
+        return "No file uploaded"
+    file = request.files['pdf']
+    if file.filename == '':
+        return "No file selected"
+
+    filename = secure_filename(file.filename)
+    pdf_path = os.path.join(UPLOAD_FOLDER, filename)
+    file.save(pdf_path)
+
+    try:
+        pages = convert_from_path(pdf_path, 500, poppler_path=POPPLER_PATH)
+        image_path = os.path.join(OUTPUT_FOLDER, 'page1.jpg')
+        pages[0].save(image_path, 'JPEG')
+
+        extracted_text = pytesseract.image_to_string(Image.open(image_path))
+        found_id = find_sa_id(extracted_text)
+
+        verification_result = "Not Verified"
+        certified_image = image_path
+        certified_pdf = None
+
+        if found_id and found_id in verified_ids:
+            verification_result = f"Verified: {verified_ids[found_id]}"
+            certified_image = add_certification_stamp(image_path)
+            certified_pdf = convert_image_to_pdf(certified_image)
+
+        copyfile(certified_image, os.path.join('static', os.path.basename(certified_image)))
+
+        return render_template('result.html',
+                               text=extracted_text,
+                               image_file=os.path.basename(certified_image),
+                               status=verification_result,
+                               pdf_file=os.path.basename(certified_pdf) if certified_pdf else None)
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+@app.route('/download_pdf')
+def download_pdf():
+    filename = request.args.get('filename')
+    return send_from_directory(OUTPUT_FOLDER, filename, as_attachment=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)

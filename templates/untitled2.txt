@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Certified Result</title>
+</head>
+<body>
+    <h2>Extracted Text</h2>
+    <pre>{{ text }}</pre>
+
+    <h2>Certified Image</h2>
+    <img src="{{ image_path }}" width="500" alt="Certified Page">
+
+    <br><br>
+    <a href="/download">Download Certified Image</a><br>
+    <a href="/">Upload Another</a>
+</body>
+</html>

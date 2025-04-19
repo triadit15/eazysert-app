@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verification Result</title>
+</head>
+<body>
+    <h1>Verification Result</h1>
+    <pre>{{ text }}</pre>
+
+    <h2>Processed Image</h2>
+    <img src="{{ url_for('static', filename=image_path) }}" width="400"><br><br>
+
+    <a href="{{ url_for('download_file', filename=image_path) }}">
+        <button>Download Certified Image</button>
+    </a><br><br>
+
+    <h2>Identity Verification</h2>
+    <form method="post" action="/verify">
+        <input type="hidden" name="image_path" value="{{ image_path }}">
+        <label for="fullname">Full Name:</label><br>
+        <input type="text" name="fullname" required><br>
+        <label for="id_number">ID Number:</label><br>
+        <input type="text" name="id_number" required><br><br>
+        <input type="submit" value="Verify Identity">
+    </form><br>
+
+    <a href="/">Upload Another File</a>
+</body>
+</html>

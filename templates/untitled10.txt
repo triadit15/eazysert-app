@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verification Result</title>
+</head>
+<body>
+    <h2>Verification Status: {{ status }}</h2>
+
+    <h3>Extracted Text</h3>
+    <pre>{{ text }}</pre>
+
+    <h3>Processed Image</h3>
+    {% if image_file %}
+        <img src="/static/{{ image_file }}" width="500"><br><br>
+    {% else %}
+        <p>No image found</p>
+    {% endif %}
+
+    {% if pdf_file %}
+        <a href="/download_pdf?filename={{ pdf_file }}">Download Certified PDF</a><br>
+    {% endif %}
+    <br><a href="/">Upload Another File</a>
+</body>
+</html>

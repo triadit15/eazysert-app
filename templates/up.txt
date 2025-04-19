@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Document</title>
+</head>
+<body>
+    <h2>Upload a PDF or Image</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+    {% if text %}
+        <h3>Extracted Text:</h3>
+        <pre>{{ text }}</pre>
+    {% endif %}
+</body>
+</html>

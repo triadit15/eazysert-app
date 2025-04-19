@@ -1,0 +1,19 @@
+<!-- templates/verify_result.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Identity Verification Result</title>
+</head>
+<body>
+    <h1>{{ result }}</h1>
+
+    <h2>Certified Document:</h2>
+    <img src="{{ url_for('static', filename=image_path) }}" width="400"><br><br>
+
+    <a href="{{ url_for('download_file', filename=image_path) }}">
+        <button>Download Certified Image</button>
+    </a><br><br>
+
+    <a href="/">Start Over</a>
+</body>
+</html>
