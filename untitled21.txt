@@ -1,6 +1,0 @@
-Flask
-Werkzeug
-pytesseract
-Pillow
-pdf2image
-Flask_SQLAlchemy
