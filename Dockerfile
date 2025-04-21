@@ -1,20 +1,24 @@
-# Use an official Python image
-FROM python:3.10-slim
+# Use an official Python base image
+FROM python:3.11-slim
 
-# Install Poppler and other dependencies
-RUN apt-get update && \
-    apt-get install -y poppler-utils tesseract-ocr && \
-    apt-get clean
+# Install system dependencies including Poppler
+RUN apt-get update && apt-get install -y \
+    poppler-utils \
+    tesseract-ocr \
+    libgl1 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set the working directory
 WORKDIR /app
 
-# Copy your project files into the container
+# Copy all files into the container
 COPY . .
 
 # Install Python dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Start the app with gunicorn
-CMD ["gunicorn", "databasesql:app", "--bind", "0.0.0.0:8000"]
+# Expose the port
+EXPOSE 5000
+
+# Run the app
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "databasesql:app"]
