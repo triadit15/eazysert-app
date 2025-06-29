@@ -38,7 +38,7 @@ def upload_file():
 
         # Certification stamp text
         stamp_text = "CERTIFIED BY EAZY SERT"
-        font_size = 30
+        font_size = 40
 
         # Define a centered rectangle for the stamp
         rect_width = width * 0.8
@@ -46,14 +46,14 @@ def upload_file():
         rect = fitz.Rect((width - rect_width) / 2, (height - rect_height) / 2,
                          (width + rect_width) / 2, (height + rect_height) / 2)
 
-        # Draw bold text inside the rectangle
+        # Draw bold, black, high-res text inside the rectangle
         page.insert_textbox(
             rect,
             stamp_text,
             fontsize=font_size,
             fontname="helv",
-            color=(1, 0, 0), # red
-            render_mode=3, # bold
+            color=(0, 0, 0), # black
+            render_mode=3, # bold (stroke)
             align=1 # center
         )
 
@@ -73,7 +73,8 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
-   
+
+        
             
 
    
