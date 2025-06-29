@@ -31,49 +31,36 @@ def upload_file():
     file.save(filepath)
 
     try:
-        # Open and stamp the PDF
         doc = fitz.open(filepath)
         page = doc[0]
         width, height = page.rect.width, page.rect.height
 
-        # Rectangle specs
-        box_width = 300
-        box_height = 100
-        center_x = width / 2
-        center_y = height / 2
-
+        # Rectangle dimensions and position
+        box_width, box_height = 300, 100
+        center_x, center_y = width / 2, height / 2
         rect = fitz.Rect(center_x - box_width / 2, center_y - box_height / 2,
                          center_x + box_width / 2, center_y + box_height / 2)
 
         # Draw bold box
         shape = page.new_shape()
         shape.draw_rect(rect)
-        shape.finish(width=2, color=(0, 0, 0)) # thick black
+        shape.finish(width=2, color=(0, 0, 0))
         shape.commit()
 
+        # Insert bold black text in the center of the box
         stamp_text = "CERTIFIED BY EAZY SERT"
-        max_font_size = 30
-        min_font_size = 10
-        fitted_font = min_font_size
-
-        # Try font sizes from large to small until it fits
-        for font_size in range(max_font_size, min_font_size - 1, -1):
-            text_width = fitz.get_text_length(stamp_text, fontname="helv", fontsize=font_size)
-            if text_width <= box_width - 10: # padding
-                fitted_font = font_size
-                break
-
-        # Insert text inside the box
+        font_size = 22 # should fit well
         page.insert_textbox(
             rect,
             stamp_text,
-            fontsize=fitted_font,
+            fontsize=font_size,
             fontname="helv",
-            color=(0, 0, 0),
+            color=(0, 0, 0), # black
             render_mode=3, # bold
             align=1 # center
         )
 
+        # Save stamped file
         stamped_filename = f"stamped_{filename}"
         stamped_path = os.path.join(app.config['STAMPED_FOLDER'], stamped_filename)
         doc.save(stamped_path)
@@ -90,8 +77,10 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
-       
-            
 
+   
+        
+
+        
+   
 
