@@ -1,11 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head><title>Scan Result</title></head>
+<head>
+    <title>Result</title>
+</head>
 <body>
-    <h2>Extracted Text</h2>
-    <pre>{{ text }}</pre>
-
-    <h2>Page Image</h2>
-    <img src="{{ image_url }}" alt="First Page" style="max-width: 100%; height: auto;">
+    <h1>PDF Processed</h1>
+    <p>{{ text }}</p>
+    <img src="{{ image_url }}" alt="Converted PDF page">
+    <br>
+    <a href="/">Upload another PDF</a>
 </body>
 </html>
