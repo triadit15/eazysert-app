@@ -35,21 +35,24 @@ def upload_file():
         page = doc[0]
         width, height = page.rect.width, page.rect.height
 
-        # Rectangle dimensions and position
-        box_width, box_height = 300, 100
-        center_x, center_y = width / 2, height / 2
+        # Rectangle specs (slightly taller to allow text fit)
+        box_width = 300
+        box_height = 120
+        center_x = width / 2
+        center_y = height / 2
+
         rect = fitz.Rect(center_x - box_width / 2, center_y - box_height / 2,
                          center_x + box_width / 2, center_y + box_height / 2)
 
-        # Draw bold box
+        # Draw the rectangle (stamp box)
         shape = page.new_shape()
         shape.draw_rect(rect)
-        shape.finish(width=2, color=(0, 0, 0))
+        shape.finish(width=2, color=(0, 0, 0)) # black outline
         shape.commit()
 
-        # Insert bold black text in the center of the box
+        # Insert stamp text inside the rectangle
         stamp_text = "CERTIFIED BY EAZY SERT"
-        font_size = 22 # should fit well
+        font_size = 18 # fits inside 300x120
         page.insert_textbox(
             rect,
             stamp_text,
@@ -60,7 +63,7 @@ def upload_file():
             align=1 # center
         )
 
-        # Save stamped file
+        # Save stamped PDF
         stamped_filename = f"stamped_{filename}"
         stamped_path = os.path.join(app.config['STAMPED_FOLDER'], stamped_filename)
         doc.save(stamped_path)
@@ -77,10 +80,3 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-   
-        
-
-        
-   
-
