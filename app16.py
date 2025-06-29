@@ -35,35 +35,38 @@ def upload_file():
         page = doc[0]
         width, height = page.rect.width, page.rect.height
 
-        # Rectangle specs (slightly taller to allow text fit)
+        # Rectangle (stamp box) settings
         box_width = 300
         box_height = 120
         center_x = width / 2
         center_y = height / 2
 
-        rect = fitz.Rect(center_x - box_width / 2, center_y - box_height / 2,
-                         center_x + box_width / 2, center_y + box_height / 2)
+        rect = fitz.Rect(
+            center_x - box_width / 2, center_y - box_height / 2,
+            center_x + box_width / 2, center_y + box_height / 2
+        )
 
-        # Draw the rectangle (stamp box)
+        # Draw rectangle
         shape = page.new_shape()
         shape.draw_rect(rect)
-        shape.finish(width=2, color=(0, 0, 0)) # black outline
+        shape.finish(width=2, color=(0, 0, 0)) # black border
         shape.commit()
 
-        # Insert stamp text inside the rectangle
+        # Insert visible bold text (testing font size for fit)
         stamp_text = "CERTIFIED BY EAZY SERT"
-        font_size = 18 # fits inside 300x120
+        font_size = 20 # safe visible size for 300x120
+
+        # You can try "Times-Bold" or "Courier-Bold" for even stronger bold
         page.insert_textbox(
             rect,
             stamp_text,
             fontsize=font_size,
-            fontname="helv",
-            color=(0, 0, 0), # black
-            render_mode=3, # bold
-            align=1 # center
+            fontname="Times-Bold",
+            color=(0, 0, 0), # solid black
+            align=1 # centered
         )
 
-        # Save stamped PDF
+        # Save stamped file
         stamped_filename = f"stamped_{filename}"
         stamped_path = os.path.join(app.config['STAMPED_FOLDER'], stamped_filename)
         doc.save(stamped_path)
@@ -80,3 +83,5 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+   
+            
