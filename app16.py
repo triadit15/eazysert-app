@@ -36,17 +36,25 @@ def upload_file():
         page = doc[0]
         width, height = page.rect.width, page.rect.height
 
-        # Add certification stamp text in the center
+        # Certification stamp text
         stamp_text = "CERTIFIED BY EAZY SERT"
-        page.insert_text(
-            fitz.Point(width / 2, height / 2),
+        font_size = 30
+
+        # Define a centered rectangle for the stamp
+        rect_width = width * 0.8
+        rect_height = font_size * 2
+        rect = fitz.Rect((width - rect_width) / 2, (height - rect_height) / 2,
+                         (width + rect_width) / 2, (height + rect_height) / 2)
+
+        # Draw bold text inside the rectangle
+        page.insert_textbox(
+            rect,
             stamp_text,
-            fontsize=30,
+            fontsize=font_size,
             fontname="helv",
-            color=(1, 0, 0), # red color
-            rotate=0,
-            render_mode=3, # bold text
-            align=1 # center align
+            color=(1, 0, 0), # red
+            render_mode=3, # bold
+            align=1 # center
         )
 
         stamped_filename = f"stamped_{filename}"
@@ -65,6 +73,8 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+   
+            
 
    
         
