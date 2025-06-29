@@ -1,18 +1,17 @@
 import os
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, send_from_directory
 from werkzeug.utils import secure_filename
 import fitz # PyMuPDF
-from PIL import Image
 
 UPLOAD_FOLDER = 'uploads'
-IMAGE_FOLDER = 'static/images'
+STAMPED_FOLDER = 'static/stamped'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['IMAGE_FOLDER'] = IMAGE_FOLDER
+app.config['STAMPED_FOLDER'] = STAMPED_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(IMAGE_FOLDER, exist_ok=True)
+os.makedirs(STAMPED_FOLDER, exist_ok=True)
 
 @app.route('/')
 def index():
@@ -32,22 +31,40 @@ def upload_file():
     file.save(filepath)
 
     try:
-        # Open PDF and convert first page to image
+        # Open and stamp the PDF
         doc = fitz.open(filepath)
-        page = doc.load_page(0)
-        pix = page.get_pixmap()
-        image_path = os.path.join(app.config['IMAGE_FOLDER'], f"{os.path.splitext(filename)[0]}.png")
-        pix.save(image_path)
+        page = doc[0]
+        width, height = page.rect.width, page.rect.height
 
-        # SKIPPING OCR
-        text = "(OCR temporarily disabled)"
+        # Add certification stamp text in the center
+        stamp_text = "CERTIFIED BY EAZY SERT"
+        page.insert_text(
+            fitz.Point(width / 2, height / 2),
+            stamp_text,
+            fontsize=30,
+            fontname="helv",
+            color=(1, 0, 0), # red color
+            rotate=0,
+            render_mode=3, # bold text
+            align=1 # center align
+        )
 
-        return render_template('result.html', text=text, image_url='/' + image_path)
+        stamped_filename = f"stamped_{filename}"
+        stamped_path = os.path.join(app.config['STAMPED_FOLDER'], stamped_filename)
+        doc.save(stamped_path)
+        doc.close()
+
+        return render_template('result.html', stamped_file=stamped_filename)
 
     except Exception as e:
         return f"Error processing PDF: {str(e)}"
 
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config['STAMPED_FOLDER'], filename, as_attachment=True)
+
 if __name__ == '__main__':
     app.run(debug=True)
-       
-    
+
+   
+        
