@@ -36,46 +36,44 @@ def upload_file():
         page = doc[0]
         width, height = page.rect.width, page.rect.height
 
-        # Define a centered rectangle for the stamp box
+        # Rectangle specs
         box_width = 300
         box_height = 100
         center_x = width / 2
         center_y = height / 2
 
-        rect = fitz.Rect(center_x - box_width/2, center_y - box_height/2,
-                         center_x + box_width/2, center_y + box_height/2)
+        rect = fitz.Rect(center_x - box_width / 2, center_y - box_height / 2,
+                         center_x + box_width / 2, center_y + box_height / 2)
 
-        # Draw the border box
+        # Draw bold box
         shape = page.new_shape()
         shape.draw_rect(rect)
-        shape.finish(width=2, color=(0, 0, 0)) # thick black box
+        shape.finish(width=2, color=(0, 0, 0)) # thick black
         shape.commit()
 
-        # Fit bold text into the rectangle dynamically
         stamp_text = "CERTIFIED BY EAZY SERT"
         max_font_size = 30
         min_font_size = 10
-        success = False
+        fitted_font = min_font_size
 
+        # Try font sizes from large to small until it fits
         for font_size in range(max_font_size, min_font_size - 1, -1):
-            text_rect = page.insert_textbox(
-                rect,
-                stamp_text,
-                fontsize=font_size,
-                fontname="helv",
-                color=(0, 0, 0),
-                render_mode=3, # bold
-                align=1, # center
-                return_type=1 # returns number of characters that fit
-            )
-            if text_rect == len(stamp_text):
-                success = True
+            text_width = fitz.get_text_length(stamp_text, fontname="helv", fontsize=font_size)
+            if text_width <= box_width - 10: # padding
+                fitted_font = font_size
                 break
 
-        if not success:
-            return "Text could not be fitted into the rectangle."
+        # Insert text inside the box
+        page.insert_textbox(
+            rect,
+            stamp_text,
+            fontsize=fitted_font,
+            fontname="helv",
+            color=(0, 0, 0),
+            render_mode=3, # bold
+            align=1 # center
+        )
 
-        # Save the stamped PDF
         stamped_filename = f"stamped_{filename}"
         stamped_path = os.path.join(app.config['STAMPED_FOLDER'], stamped_filename)
         doc.save(stamped_path)
@@ -92,3 +90,8 @@ def download_file(filename):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+       
+            
+
+
