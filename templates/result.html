@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Result</title>
+    <title>Certified PDF</title>
 </head>
 <body>
-    <h1>PDF Processed</h1>
-    <p>{{ text }}</p>
-    <img src="{{ image_url }}" alt="Converted PDF page">
-    <br>
-    <a href="/">Upload another PDF</a>
+    <h1>Document Certified</h1>
+    <p>Your document has been stamped successfully.</p>
+    <a href="{{ url_for('download_file', filename=stamped_file) }}">Download Certified PDF</a><br>
+    <a href="/">Certify another</a>
 </body>
 </html>
