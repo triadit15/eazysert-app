@@ -1,5 +1,4 @@
 Flask
-pymupdf
-pytesseract
+PyMuPDF
 Pillow
 gunicorn
